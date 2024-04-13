@@ -6,8 +6,15 @@ import androidx.room.RoomDatabase
 import com.study.government.GovernmentApp
 import com.study.government.model.New
 import com.study.government.model.Request
+import com.study.government.model.Servant
 
-@Database(entities = [New::class, Request::class], version = 5)
+@Database(
+    entities = [
+        New::class,
+        Request::class,
+        Servant::class],
+    version = 6
+)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun getDao(): Dao

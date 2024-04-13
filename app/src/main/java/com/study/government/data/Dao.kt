@@ -8,6 +8,7 @@ import androidx.room.Query
 import androidx.room.Update
 import com.study.government.model.New
 import com.study.government.model.Request
+import com.study.government.model.Servant
 
 @Dao
 interface Dao {
@@ -54,4 +55,24 @@ interface Dao {
 
     @Delete
     suspend fun deleteRequest(value: Request)
+
+    /// Служащие ///////////////////////////////////////////////
+
+    @Query("SELECT * FROM servants")
+    suspend fun getServants(): List<Servant>
+
+    @Query("SELECT * FROM servants WHERE id = :servantId")
+    suspend fun getServantById(servantId: Long): List<Servant>
+
+    @Query("DELETE FROM servants")
+    suspend fun clearAllServants()
+
+    @Insert(onConflict = REPLACE)
+    suspend fun addServant(value: Servant)
+
+    @Update
+    suspend fun editServant(value: Servant)
+
+    @Delete
+    suspend fun deleteServant(value: Servant)
 }

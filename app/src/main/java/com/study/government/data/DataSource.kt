@@ -3,6 +3,7 @@ package com.study.government.data
 import com.study.government.data.AppDatabase.Companion.dbDao
 import com.study.government.data.Presets.newsPresets
 import com.study.government.data.Presets.requestsPresets
+import com.study.government.data.Presets.servantsPresets
 import com.study.government.data.Presets.usersPresets
 import com.study.government.model.New
 import com.study.government.model.Request
@@ -20,11 +21,13 @@ object DataSource {
     suspend fun setDbPresets() = withContext(IO) {
         clearDb()
         requestsPresets.forEach { dbDao.addRequest(it) }
+        servantsPresets.forEach { dbDao.addServant(it) }
         newsPresets.forEach { dbDao.addNew(it) }
     }
 
     suspend fun clearDb() = withContext(IO) {
         dbDao.clearAllRequests()
+        dbDao.clearAllServants()
         dbDao.clearAllNews()
     }
 
@@ -92,7 +95,17 @@ object DataSource {
         dbDao.addNew(new)
     }
 
-    suspend fun deleteRequest(request: Request) {
+    suspend fun deleteRequest(request: Request) = withContext(IO) {
         dbDao.deleteRequest(request)
+    }
+
+    suspend fun getAllServants() = withContext(IO) {
+        success(dbDao.getServants())
+    }
+
+    suspend fun getServantById(servantId: Long) = withContext(IO) {
+        dbDao.getServantById(servantId).firstOrNull()?.let { success(it) } ?: run {
+            failure(Throwable("Не удалось найти служащего по данному id".logE(LOG_TAG)))
+        }
     }
 }

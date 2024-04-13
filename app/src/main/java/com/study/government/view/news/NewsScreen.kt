@@ -16,7 +16,6 @@ import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.CardDefaults.cardElevation
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterStart
@@ -122,7 +121,10 @@ private fun NewsContent(
     val mainVm = getViewModel<MainViewModel>()
 
     LaunchedEffect(Unit) {
-        if (mainVm.news.isEmpty()) mainVm.uploadNews()
+        GovernmentApp.curScreen = NEWS
+        if (mainVm.news.isEmpty()) {
+            mainVm.uploadNews()
+        }
     }
 
     Crossfade(

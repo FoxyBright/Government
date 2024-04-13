@@ -75,4 +75,5 @@
     <string name="title">Заголовок:</string>
     <string name="add_link">Ссылка на источник</string>
     <string name="new_placeholder_image">NEWS</string>
+    <string name="servants_list">Список госслужащих</string>
 </resources>

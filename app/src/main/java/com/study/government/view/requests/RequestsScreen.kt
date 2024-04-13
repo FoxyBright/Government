@@ -73,6 +73,22 @@ fun RequestsScreen(navHostController: NavHostController) {
     val statusFilters = mainVm
         .requestStatusFilters.collectAsState()
 
+    val requestList = mainVm.requests.collectAsState()
+
+    val requests = remember(
+        statusFilters.value, themeFilters.value, requestList.value
+    ) {
+        requestList.value.filter {
+            val inStatus = statusFilters.value.run {
+                if (isEmpty()) true else contains(it.status)
+            }
+            val inTheme = themeFilters.value.run {
+                if (isEmpty()) true else contains(it.theme)
+            }
+            inStatus && inTheme
+        }.toMutableStateList()
+    }
+
     LaunchedEffect(Unit) {
         GovernmentApp.curScreen = REQUESTS
         if (mainVm.firstUploadRequests) {
@@ -119,21 +135,6 @@ fun RequestsScreen(navHostController: NavHostController) {
                 }
             }
         ) { padding ->
-            val requestList = mainVm.requests.collectAsState()
-            val requests = remember(
-                statusFilters.value, themeFilters.value, requestList.value
-            ) {
-                requestList.value.filter {
-                    val inStatus = statusFilters.value.run {
-                        if (isEmpty()) true else contains(it.status)
-                    }
-                    val inTheme = themeFilters.value.run {
-                        if (isEmpty()) true else contains(it.theme)
-                    }
-                    inStatus && inTheme
-                }.toMutableStateList()
-            }
-
             DefaultPullRefreshContainer(
                 refreshing = mainVm.refreshRequests,
                 modifier = Modifier
@@ -149,8 +150,7 @@ fun RequestsScreen(navHostController: NavHostController) {
                     loading -> Box(contentAlignment = Center) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(40.dp),
-                            color = mainVm.newsCategory?.color
-                                ?: PrimaryColor,
+                            color = PrimaryColor,
                             strokeWidth = 3.dp
                         )
                     }
@@ -266,11 +266,10 @@ private fun FilterItem(
 @Composable
 private fun RequestsContent(
     requests: List<Request>,
-    modifier: Modifier = Modifier,
     navHostController: NavHostController
 ) {
     LazyColumn(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(Background)
             .padding(horizontal = 16.dp)

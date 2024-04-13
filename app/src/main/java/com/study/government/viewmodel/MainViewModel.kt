@@ -11,6 +11,7 @@ import com.study.government.data.DataSource
 import com.study.government.data.DataSource.clearDb
 import com.study.government.data.DataSource.editRequest
 import com.study.government.data.DataSource.getAllRequests
+import com.study.government.data.DataSource.getAllServants
 import com.study.government.data.DataSource.getNews
 import com.study.government.data.DataSource.getUser
 import com.study.government.data.DataSource.getUserRequests
@@ -21,6 +22,7 @@ import com.study.government.model.NewsCategory
 import com.study.government.model.Request
 import com.study.government.model.RequestStatus
 import com.study.government.model.RequestTheme
+import com.study.government.model.Servant
 import com.study.government.model.User
 import com.study.government.model.UserRole.ADMIN
 import com.study.government.tools.SharedPrefs
@@ -46,6 +48,10 @@ class MainViewModel(
 
     var refreshRequests by mutableStateOf(false)
     var refreshNews by mutableStateOf(false)
+
+    val servants = mutableStateListOf<Servant>()
+    var pendingServants by mutableStateOf(false)
+    var refreshServants by mutableStateOf(false)
 
     private val _requestStatusFilters =
         MutableStateFlow<List<RequestStatus>>(emptyList())
@@ -156,6 +162,7 @@ class MainViewModel(
             setDbPresets()
             uploadNews()
             uploadRequests()
+            uploadServants()
         }
     }
 
@@ -164,6 +171,7 @@ class MainViewModel(
             clearDb()
             uploadNews()
             uploadRequests()
+            uploadServants()
         }
     }
 
@@ -192,6 +200,18 @@ class MainViewModel(
         viewModelScope.launch {
             DataSource.addNew(new)
             uploadRequests()
+        }
+    }
+
+    fun uploadServants() {
+        pendingServants = true
+        viewModelScope.launch {
+            getAllServants().onSuccess {
+                servants.clear()
+                servants.addAll(it)
+            }
+            pendingServants = false
+            refreshServants = false
         }
     }
 }

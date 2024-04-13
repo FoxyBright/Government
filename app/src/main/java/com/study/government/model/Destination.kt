@@ -10,6 +10,7 @@ enum class Destination(
 ) {
     SERVANTS("servants", true),
     SERVANTS_INFO("servant_info/{${SERVANT_INFO_ARG.arg}}"),
+    ADD_SERVANT("add_servant/{${SERVANT_INFO_ARG.arg}}"),
     REQUESTS("requests", true),
     PROFILE("profile", true),
     NEWS("news", true),
