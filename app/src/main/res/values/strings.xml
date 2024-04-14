@@ -86,4 +86,6 @@
     <string name="merits">Государственные награды</string>
     <string name="servant_merits">Государственные награды:</string>
     <string name="try_also">Попробуйте также</string>
+    <string name="call_confirence">Созвать конференцию</string>
+    <string name="add_later">Функция пока недоступна, подождите следующего обновлнения</string>
 </resources>

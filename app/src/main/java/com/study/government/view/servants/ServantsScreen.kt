@@ -1,5 +1,7 @@
 package com.study.government.view.servants
 
+import android.widget.Toast
+import android.widget.Toast.LENGTH_LONG
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -32,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.DarkGray
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Medium
@@ -53,7 +56,9 @@ import com.study.government.model.UserRole.ADMIN
 import com.study.government.tools.Navigation.navigateTo
 import com.study.government.tools.getViewModel
 import com.study.government.ui.theme.Background
+import com.study.government.ui.theme.EcologyColor
 import com.study.government.ui.theme.PrimaryColor
+import com.study.government.view.components.DefaultButton
 import com.study.government.view.components.DefaultPullRefreshContainer
 import com.study.government.viewmodel.MainViewModel
 
@@ -138,6 +143,7 @@ private fun ServantsContent(
     servants: List<Servant>,
     navHostController: NavHostController
 ) {
+    val context = LocalContext.current
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -145,6 +151,22 @@ private fun ServantsContent(
             .padding(horizontal = 16.dp)
     ) {
         item { Spacer(Modifier.height(12.dp)) }
+
+        item {
+            DefaultButton(
+                text = stringResource(R.string.call_confirence),
+                textColor = White,
+                color = EcologyColor
+            ) {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.add_later),
+                    LENGTH_LONG
+                ).show()
+            }
+        }
+
+        item { Spacer(Modifier.height(20.dp)) }
 
         item {
             Text(
