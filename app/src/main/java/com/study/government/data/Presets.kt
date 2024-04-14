@@ -2,6 +2,8 @@ package com.study.government.data
 
 import android.text.format.DateUtils.WEEK_IN_MILLIS
 import com.study.government.GovernmentApp.Companion.curTime
+import com.study.government.R
+import com.study.government.model.AdditionalApp
 import com.study.government.model.New
 import com.study.government.model.Request
 import com.study.government.model.RequestStatus.OPENED
@@ -383,6 +385,34 @@ object Presets {
                     "• Орден Александра Невского (21 марта 2014 года)." +
                     "\n\n" +
                     "• Орден преподобного Сергия Радонежского II степени (РПЦ, 2024)."
+        )
+    )
+
+    val additionalAppPresets = listOf(
+        AdditionalApp(
+            name = "Госуслуги",
+            link = "https://play.google.com/store/apps/details?id=ru.rostel",
+            avatar = R.drawable.gos_logo
         ),
+        AdditionalApp(
+            name = "Мой налог",
+            link = "https://play.google.com/store/apps/details?id=com.gnivts.selfemployed",
+            avatar = R.drawable.nalog
+        ),
+        AdditionalApp(
+            name = "МФЦ",
+            link = "https://play.google.com/store/apps/details?id=com.sc.mfckbr",
+            avatar = R.drawable.mfc
+        ),
+        AdditionalApp(
+            name = "МВД РФ",
+            link = "https://play.google.com/store/apps/details?id=ru.mvd",
+            avatar = R.drawable.mvd
+        ),
+        AdditionalApp(
+            name = "МЧС РФ",
+            link = "https://play.google.com/store/apps/details?id=io.citizens.security",
+            avatar = R.drawable.mcs
+        )
     )
 }

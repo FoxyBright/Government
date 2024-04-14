@@ -85,4 +85,5 @@
     <string name="post">Должность:</string>
     <string name="merits">Государственные награды</string>
     <string name="servant_merits">Государственные награды:</string>
+    <string name="try_also">Попробуйте также</string>
 </resources>

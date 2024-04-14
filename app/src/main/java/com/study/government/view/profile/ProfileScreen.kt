@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
+import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +18,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -50,12 +53,13 @@ import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
+import androidx.compose.ui.layout.ContentScale.Companion.FillHeight
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.Medium
 import androidx.compose.ui.text.font.FontWeight.Companion.Normal
+import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -64,10 +68,12 @@ import coil.compose.AsyncImage
 import com.study.government.BuildConfig.VERSION_NAME
 import com.study.government.GovernmentApp
 import com.study.government.R
+import com.study.government.data.Presets.additionalAppPresets
 import com.study.government.model.Destination.LOGIN
 import com.study.government.model.Destination.PROFILE
 import com.study.government.tools.Navigation.navigateTo
 import com.study.government.tools.WebWorker.openGosuslugi
+import com.study.government.tools.WebWorker.openInWeb
 import com.study.government.tools.getViewModel
 import com.study.government.ui.theme.Background
 import com.study.government.ui.theme.PrimaryColor
@@ -166,6 +172,12 @@ fun ProfileScreen(navHostController: NavHostController) {
                 Spacer(Modifier.height(22.dp))
 
                 GosButton()
+
+                Spacer(Modifier.height(8.dp))
+
+                TryAlso()
+
+                Spacer(Modifier.height(8.dp))
 
                 Crossfade(
                     targetState = showDbSettings,
@@ -302,7 +314,7 @@ private fun ExitDialog(
                     text = stringResource(R.string.exit_dialog),
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = SemiBold,
                     fontSize = 24.sp,
                     color = Color.Black
                 )
@@ -331,7 +343,7 @@ private fun ExitDialog(
                     ) {
                         Text(
                             text = stringResource(R.string.cancel),
-                            fontWeight = FontWeight.SemiBold,
+                            fontWeight = SemiBold,
                             color = PrimaryColor,
                             fontSize = 18.sp
                         )
@@ -352,7 +364,7 @@ private fun ExitDialog(
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            fontWeight = FontWeight.SemiBold,
+                            fontWeight = SemiBold,
                             text = stringResource(R.string.ok),
                             color = PrimaryColor,
                             fontSize = 18.sp
@@ -392,6 +404,66 @@ private fun DataCard(
                 fontSize = 14.sp,
                 fontWeight = Normal
             )
+        }
+    }
+}
+
+@Composable
+private fun TryAlso() {
+    val context = LocalContext.current
+    Column {
+        Spacer(Modifier.height(12.dp))
+
+        Text(
+            modifier = Modifier.padding(start = 18.dp),
+            text = stringResource(R.string.try_also),
+            fontWeight = SemiBold,
+            color = PrimaryColor,
+            fontSize = 16.sp
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = spacedBy(8.dp)
+        ) {
+            item { Spacer(Modifier.width(8.dp)) }
+
+            items(additionalAppPresets) { addApp ->
+                Card(
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = cardElevation(2.dp),
+                    colors = cardColors(White),
+                    modifier = Modifier,
+                    onClick = {
+                        openInWeb(context, addApp.link)
+                    }
+                ) {
+                    Column(
+                        horizontalAlignment = CenterHorizontally,
+                        modifier = Modifier.padding(10.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(addApp.avatar),
+                            contentDescription = null,
+                            modifier = Modifier.size(50.dp),
+                            contentScale = FillHeight
+                        )
+
+                        Spacer(Modifier.height(4.dp))
+
+                        Text(
+                            fontWeight = Medium,
+                            text = addApp.name,
+                            color = DarkGray,
+                            fontSize = 16.sp
+                        )
+                    }
+                }
+            }
+
+            item { Spacer(Modifier.width(8.dp)) }
         }
     }
 }

@@ -64,7 +64,6 @@ import com.study.government.model.UserRole.ADMIN
 import com.study.government.tools.Navigation.navigateTo
 import com.study.government.tools.WebWorker.openInWeb
 import com.study.government.tools.getViewModel
-import com.study.government.tools.logE
 import com.study.government.ui.theme.Background
 import com.study.government.ui.theme.PrimaryColor
 import com.study.government.view.components.ProgressIndicator
@@ -273,11 +272,7 @@ fun NewInfoScreen(
                         sourceText
                             .getStringAnnotations(riaNews, it, it)
                             .firstOrNull()?.let {
-                                try {
-                                    openInWeb(context, link)
-                                } catch (e: Exception) {
-                                    e.message.logE("error ope in web")
-                                }
+                                openInWeb(context, link)
                             }
                     }
                 )
