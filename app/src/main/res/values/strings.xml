@@ -69,15 +69,20 @@
     <string name="edit_request">Редактирование запроса</string>
     <string name="add_new">Создание новости</string>
     <string name="edit_new">Редактирование новости</string>
+    <string name="add_servant">Добавление служащего</string>
+    <string name="save_servant">Сохранить</string>
+    <string name="edit_servant">Редактирование служащего</string>
     <string name="delete_request">Удалить запрос</string>
     <string name="select_theme">Выберите тему запроса:</string>
     <string name="send_request">Отправить запрос</string>
     <string name="create_new">Опубликовать новость</string>
     <string name="title">Заголовок:</string>
-    <string name="add_link">Ссылка на источник</string>
+    <string name="name">Имя:</string>
+    <string name="add_link">Ссылка на источник:</string>
     <string name="new_placeholder_image">NEWS</string>
     <string name="servants_list">Список госслужащих</string>
     <string name="departament">Отдел:</string>
     <string name="post">Должность:</string>
     <string name="merits">Государственные награды</string>
+    <string name="servant_merits">Государственные награды:</string>
 </resources>

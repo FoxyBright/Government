@@ -96,6 +96,10 @@ object DataSource {
         dbDao.addNew(new)
     }
 
+    suspend fun addServant(servant: Servant) = withContext(IO) {
+        dbDao.addServant(servant)
+    }
+
     suspend fun deleteRequest(request: Request) = withContext(IO) {
         dbDao.deleteRequest(request)
     }

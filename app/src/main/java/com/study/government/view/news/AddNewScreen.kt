@@ -1,11 +1,6 @@
 package com.study.government.view.news
 
-import android.content.Context
-import android.content.Intent
-import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.net.Uri
-import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
@@ -54,16 +49,15 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.study.government.GovernmentApp
 import com.study.government.R
 import com.study.government.data.DataSource.getNewById
 import com.study.government.model.Destination.ADD_NEW
 import com.study.government.model.New
-import com.study.government.tools.getSettingsUri
 import com.study.government.tools.getViewModel
 import com.study.government.tools.neededStoragePermissions
+import com.study.government.tools.openGallery
 import com.study.government.ui.theme.PrimaryColor
 import com.study.government.view.components.DefaultButton
 import com.study.government.view.requests.TopBar
@@ -312,23 +306,3 @@ fun AddNewScreen(
     }
 }
 
-@OptIn(ExperimentalPermissionsApi::class)
-fun MultiplePermissionsState.openGallery(
-    imagePicker: ManagedActivityResultLauncher<String, Uri?>,
-    context: Context
-) {
-    when {
-        allPermissionsGranted -> imagePicker.launch("image/*")
-
-        shouldShowRationale -> context.startActivity(
-            Intent(
-                ACTION_APPLICATION_DETAILS_SETTINGS
-            ).apply {
-                addFlags(FLAG_ACTIVITY_NEW_TASK)
-                data = getSettingsUri(context.packageName)
-            }
-        )
-
-        else -> launchMultiplePermissionRequest()
-    }
-}
