@@ -199,7 +199,21 @@ class MainViewModel(
     fun addNew(new: New) {
         viewModelScope.launch {
             DataSource.addNew(new)
-            uploadRequests()
+            uploadNews()
+        }
+    }
+
+    fun deleteNew(new: New) {
+        viewModelScope.launch {
+            DataSource.deleteNew(new)
+            uploadNews()
+        }
+    }
+
+    fun deleteServant(servant: Servant) {
+        viewModelScope.launch {
+            DataSource.deleteServant(servant)
+            uploadServants()
         }
     }
 

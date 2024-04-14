@@ -64,6 +64,7 @@
     <string name="comment_placeholder">Введите комментарий</string>
     <string name="problem_description">Описание проблемы</string>
     <string name="description">Описание:</string>
+    <string name="servant_description">Описание</string>
     <string name="add_request">Создание запроса</string>
     <string name="edit_request">Редактирование запроса</string>
     <string name="add_new">Создание новости</string>
@@ -76,4 +77,7 @@
     <string name="add_link">Ссылка на источник</string>
     <string name="new_placeholder_image">NEWS</string>
     <string name="servants_list">Список госслужащих</string>
+    <string name="departament">Отдел:</string>
+    <string name="post">Должность:</string>
+    <string name="merits">Государственные награды</string>
 </resources>

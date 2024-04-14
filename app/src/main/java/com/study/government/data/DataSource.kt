@@ -7,6 +7,7 @@ import com.study.government.data.Presets.servantsPresets
 import com.study.government.data.Presets.usersPresets
 import com.study.government.model.New
 import com.study.government.model.Request
+import com.study.government.model.Servant
 import com.study.government.tools.logE
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.delay
@@ -97,6 +98,14 @@ object DataSource {
 
     suspend fun deleteRequest(request: Request) = withContext(IO) {
         dbDao.deleteRequest(request)
+    }
+
+    suspend fun deleteNew(new: New) = withContext(IO) {
+        dbDao.deleteNew(new)
+    }
+
+    suspend fun deleteServant(servant: Servant) = withContext(IO) {
+        dbDao.deleteServant(servant)
     }
 
     suspend fun getAllServants() = withContext(IO) {

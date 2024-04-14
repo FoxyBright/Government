@@ -1,6 +1,5 @@
 package com.study.government.view.servants
 
-import android.net.Uri
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -28,23 +27,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color.Companion.DarkGray
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Medium
 import androidx.compose.ui.text.font.FontWeight.Companion.Normal
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImage
 import com.study.government.GovernmentApp
 import com.study.government.R
 import com.study.government.model.Destination.ADD_SERVANT
@@ -153,13 +149,15 @@ private fun ServantsContent(
         item {
             Text(
                 text = stringResource(R.string.servants_list),
-                fontWeight = SemiBold,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
                 color = PrimaryColor,
-                fontSize = 20.sp
+                fontWeight = SemiBold,
+                fontSize = 24.sp
             )
         }
 
-        item { Spacer(Modifier.height(12.dp)) }
+        item { Spacer(Modifier.height(20.dp)) }
 
         items(servants) { servant ->
             ServantItem(servant) {
@@ -189,43 +187,12 @@ private fun ServantItem(
         onClick = onClick
     ) {
         Row(
+            verticalAlignment = CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(10.dp)
         ) {
-            when {
-                servant.avatarPath.isNotBlank() -> Uri.parse(servant.avatarPath)
-                servant.avatarUrl.isNotBlank() -> servant.avatarUrl
-                else -> null
-            }?.let { image ->
-                AsyncImage(
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(80.dp)
-                        .clip(CircleShape),
-                    contentScale = Crop,
-                    model = image
-                )
-            } ?: run {
-                Box(
-                    modifier = Modifier
-                        .size(80.dp)
-                        .clip(CircleShape)
-                        .background(PrimaryColor),
-                    contentAlignment = Center
-                ) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(
-                            R.drawable.profile_placeholder
-                        ),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(60.dp)
-                            .clip(CircleShape),
-                        tint = White
-                    )
-                }
-            }
+            ServantAvatar(servant, 80.dp)
 
             Spacer(Modifier.width(8.dp))
 
