@@ -1,7 +1,15 @@
 package com.study.government.view.news
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Arrangement.spacedBy
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells.Fixed
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -24,24 +32,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.study.government.R
-import com.study.government.model.NewsCategory
-import com.study.government.tools.getViewModel
-import com.study.government.ui.theme.Background
-import com.study.government.viewmodel.MainViewModel
+import com.study.government.model.news.NewsCategory
+import com.study.government.model.news.NewsCategory.entries
+import com.study.government.tools.Background
 
 @Composable
-fun NewsCategoryScreen(modifier: Modifier = Modifier) {
-    val mainVm = getViewModel<MainViewModel>()
-    val config = LocalConfiguration.current
-    
-    Column(
+fun NewsCategoryScreen(
+    modifier: Modifier = Modifier,
+    onCategoryClick: (NewsCategory) -> Unit
+) {
+   Column(
         modifier = modifier
             .fillMaxSize()
             .background(Background)
     ) {
-        
         Spacer(Modifier.height(20.dp))
-        
+
         Text(
             text = stringResource(R.string.select_category),
             modifier = Modifier.padding(horizontal = 16.dp),
@@ -50,23 +56,25 @@ fun NewsCategoryScreen(modifier: Modifier = Modifier) {
             fontSize = 20.sp,
             color = DarkGray
         )
-        
+
         Spacer(Modifier.height(20.dp))
-        
+
         LazyVerticalGrid(
+            horizontalArrangement = spacedBy(10.dp),
+            contentPadding = PaddingValues(10.dp),
+            verticalArrangement = spacedBy(10.dp),
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 8.dp),
-            contentPadding = PaddingValues(10.dp),
-            columns = Fixed(2),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
+            columns = Fixed(2)
         ) {
-            items(NewsCategory.entries) { category ->
+            items(entries) { category ->
                 Card(
-                    onClick = { mainVm.newsCategory = category },
+                    onClick = { onCategoryClick(category) },
                     modifier = Modifier.size(
-                        config.screenWidthDp.div(2).minus(50).dp
+                        LocalConfiguration.current
+                            .screenWidthDp.div(2)
+                            .minus(50).dp
                     ),
                     elevation = cardElevation(2.dp),
                     colors = cardColors(White)
@@ -82,7 +90,9 @@ fun NewsCategoryScreen(modifier: Modifier = Modifier) {
                             modifier = Modifier.size(60.dp),
                             tint = category.color
                         )
+
                         Spacer(Modifier.height(6.dp))
+
                         Text(
                             text = stringResource(category.label),
                             modifier = Modifier.padding(6.dp),

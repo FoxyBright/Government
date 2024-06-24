@@ -1,21 +1,35 @@
 package com.study.government.view.news
 
 import android.annotation.SuppressLint
-import android.net.Uri
+import androidx.activity.ComponentActivity
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
+import androidx.compose.foundation.layout.Arrangement.spacedBy
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.CardDefaults.cardElevation
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterStart
@@ -25,6 +39,7 @@ import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Medium
@@ -32,39 +47,38 @@ import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.text.style.TextAlign.Companion.End
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.study.government.GovernmentApp
+import com.study.government.GovernmentApp.Companion.curScreen
 import com.study.government.R
-import com.study.government.model.Destination.ADD_NEW
-import com.study.government.model.Destination.NEWS
-import com.study.government.model.Destination.NEW_INFO
-import com.study.government.model.DestinationArg.NEW_INFO_ARG
-import com.study.government.model.NavArgument
-import com.study.government.model.New
-import com.study.government.model.UserRole.ADMIN
-import com.study.government.tools.Navigation.navigateTo
-import com.study.government.tools.getViewModel
-import com.study.government.ui.theme.Background
-import com.study.government.ui.theme.PrimaryColor
-import com.study.government.view.components.DefaultPullRefreshContainer
-import com.study.government.view.components.ProgressIndicator
-import com.study.government.viewmodel.MainViewModel
+import com.study.government.model.news.New
+import com.study.government.model.news.newsPresets
+import com.study.government.navigation.Destination.NEWS
+import com.study.government.navigation.Destination.NEW_INFO
+import com.study.government.navigation.DestinationArg.NEW_INFO_ARG
+import com.study.government.navigation.NavArgument
+import com.study.government.navigation.Navigation.navigateTo
+import com.study.government.tools.Background
+import com.study.government.tools.PrimaryColor
 import java.text.SimpleDateFormat
 import java.util.Date
 
 @Composable
 fun NewsScreen(navHostController: NavHostController) {
-    val mainVm = getViewModel<MainViewModel>()
-    LaunchedEffect(Unit) { GovernmentApp.curScreen = NEWS }
+    val newsVm = viewModel<NewsViewModel>(
+        LocalContext.current as ComponentActivity
+    )
+
+    LaunchedEffect(Unit) { curScreen = NEWS }
 
     Crossfade(
-        targetState = mainVm.newsCategory == null,
+        targetState = newsVm.newsCategory == null,
         label = "News category animation"
     ) { showCategory ->
         Scaffold(
             topBar = {
-                mainVm.newsCategory?.apply {
+                newsVm.newsCategory?.apply {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -84,11 +98,9 @@ fun NewsScreen(navHostController: NavHostController) {
                                         MutableInteractionSource()
                                     },
                                     indication = null
-                                ) {
-                                    mainVm.newsCategory = null
-                                    mainVm.news.clear()
-                                }
+                                ) { newsVm.newsCategory = null }
                         )
+
                         Text(
                             modifier = Modifier.align(Center),
                             text = stringResource(label),
@@ -101,7 +113,9 @@ fun NewsScreen(navHostController: NavHostController) {
             }
         ) { padding ->
             if (showCategory) {
-                NewsCategoryScreen(Modifier.padding(padding))
+                NewsCategoryScreen(
+                    modifier = Modifier.padding(padding)
+                ) { newsVm.newsCategory = it }
             } else {
                 NewsContent(
                     navHostController = navHostController,
@@ -113,90 +127,35 @@ fun NewsScreen(navHostController: NavHostController) {
 }
 
 @Composable
-@OptIn(ExperimentalMaterialApi::class)
 private fun NewsContent(
     navHostController: NavHostController,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
-    val mainVm = getViewModel<MainViewModel>()
+    LaunchedEffect(Unit) { curScreen = NEWS }
 
-    LaunchedEffect(Unit) {
-        GovernmentApp.curScreen = NEWS
-        if (mainVm.news.isEmpty()) {
-            mainVm.uploadNews()
-        }
-    }
-
-    Crossfade(
-        targetState = mainVm.pendingNews
-                && mainVm.news.isEmpty(),
-        label = "News animation",
+    Scaffold(
         modifier = modifier
-    ) { loading ->
-        DefaultPullRefreshContainer(
-            refreshing = mainVm.refreshNews,
-            onRefresh = {
-                mainVm.refreshNews = true
-                mainVm.uploadNews()
-            }
+            .fillMaxSize()
+            .background(Background),
+    ) { paddings ->
+        LazyColumn(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .padding(paddings),
+            verticalArrangement = spacedBy(12.dp)
         ) {
-            if (loading) {
-                ProgressIndicator(
-                    color = mainVm.newsCategory?.color
-                        ?: PrimaryColor
-                )
-            } else {
-                Scaffold(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Background),
-                    floatingActionButton = {
-                        if (mainVm.user?.role == ADMIN) {
-                            Card(
-                                elevation = cardElevation(4.dp),
-                                colors = cardColors(White),
-                                shape = CircleShape,
-                                onClick = {
-                                    navHostController.navigateTo(
-                                        arg = NavArgument(
-                                            argument = NEW_INFO_ARG,
-                                            value = "-1"
-                                        ),
-                                        dest = ADD_NEW
-                                    )
-                                }
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_plus),
-                                    contentDescription = null,
-                                    tint = PrimaryColor,
-                                    modifier = Modifier
-                                        .padding(16.dp)
-                                        .size(20.dp)
-                                )
-                            }
-                        }
-                    }
-                ) { paddings ->
-                    LazyColumn(
-                        modifier = Modifier
+            item { Spacer(Modifier) }
 
-                            .padding(horizontal = 16.dp)
-                            .padding(paddings)
-                    ) {
-                        item { Spacer(Modifier.height(12.dp)) }
-                        items(mainVm.news) { new ->
-                            NewItem(new) {
-                                navHostController.navigateTo(
-                                    arg = NavArgument(NEW_INFO_ARG, new.id),
-                                    dest = NEW_INFO
-                                )
-                            }
-                            Spacer(Modifier.height(12.dp))
-                        }
-                    }
+            items(newsPresets) { new ->
+                NewItem(new) {
+                    navHostController.navigateTo(
+                        arg = NavArgument(NEW_INFO_ARG, new.id),
+                        dest = NEW_INFO
+                    )
                 }
             }
+
+            item { Spacer(Modifier) }
         }
     }
 }
@@ -220,11 +179,7 @@ private fun NewItem(
     ) {
         Column {
             Box {
-                when {
-                    new.imagePath.isNotBlank() -> Uri.parse(new.imagePath)
-                    new.imageUrl.isNotBlank() -> new.imageUrl
-                    else -> null
-                }?.let { image ->
+                new.imageUrl?.ifBlank { null }?.let { image ->
                     AsyncImage(
                         contentDescription = null,
                         modifier = Modifier

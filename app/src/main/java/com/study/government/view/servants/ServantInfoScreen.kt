@@ -1,12 +1,10 @@
 package com.study.government.view.servants
 
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -27,8 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
-import androidx.compose.ui.Alignment.Companion.CenterVertically
-import androidx.compose.ui.Alignment.Companion.TopEnd
+import androidx.compose.ui.Alignment.Companion.CenterStart
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -36,6 +34,8 @@ import androidx.compose.ui.graphics.Color.Companion.DarkGray
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.ContentScale.Companion.Crop
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.SpanStyle
@@ -49,22 +49,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.study.government.GovernmentApp
+import com.study.government.GovernmentApp.Companion.curScreen
 import com.study.government.R
-import com.study.government.data.DataSource.getServantById
-import com.study.government.model.Destination.ADD_SERVANT
-import com.study.government.model.Destination.SERVANTS_INFO
-import com.study.government.model.DestinationArg.SERVANT_INFO_ARG
-import com.study.government.model.NavArgument
 import com.study.government.model.Servant
-import com.study.government.model.UserRole.ADMIN
-import com.study.government.tools.Navigation.navigateTo
-import com.study.government.tools.getViewModel
-import com.study.government.ui.theme.PrimaryColor
-import com.study.government.ui.theme.RedColor
-import com.study.government.view.components.ProgressIndicator
-import com.study.government.view.requests.TopBar
-import com.study.government.viewmodel.MainViewModel
+import com.study.government.model.servantsPresets
+import com.study.government.navigation.Destination.SERVANTS_INFO
+import com.study.government.tools.Background
+import com.study.government.tools.PrimaryColor
 
 @Composable
 fun ServantInfoScreen(
@@ -76,10 +67,12 @@ fun ServantInfoScreen(
     }
 
     LaunchedEffect(Unit) {
-        GovernmentApp.curScreen = SERVANTS_INFO
-        getServantById(servantId.toLong())
-            .onFailure { navHostController.navigateUp() }
-            .onSuccess { servant = it }
+        curScreen = SERVANTS_INFO
+
+        servantsPresets
+            .find { it.id == servantId.toLongOrNull() }
+            ?.let { servant = it }
+            ?: navHostController.navigateUp()
     }
 
     servant?.apply {
@@ -87,25 +80,30 @@ fun ServantInfoScreen(
             topBar = { TopBar(navHostController) }
         ) { paddings ->
             Content(
-                navHostController = navHostController,
                 modifier = Modifier
                     .padding(paddings),
                 servant = this
             )
         }
-    } ?: run {
-        ProgressIndicator(PrimaryColor)
+    } ?: Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Background),
+        contentAlignment = Center
+    ) {
+        CircularProgressIndicator(
+            modifier = Modifier.size(40.dp),
+            color = PrimaryColor,
+            strokeWidth = 3.dp
+        )
     }
 }
 
 @Composable
 private fun Content(
-    navHostController: NavHostController,
     modifier: Modifier = Modifier,
     servant: Servant,
 ) {
-    val mainVm = getViewModel<MainViewModel>()
-
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -115,55 +113,6 @@ private fun Content(
         Spacer(Modifier.height(30.dp))
 
         Box(Modifier.fillMaxWidth()) {
-            if (mainVm.user?.role == ADMIN) {
-                Row(
-                    verticalAlignment = CenterVertically,
-                    modifier = Modifier.align(TopEnd),
-                ) {
-                    Icon(
-                        imageVector = ImageVector
-                            .vectorResource(R.drawable.ic_edit),
-                        contentDescription = null,
-                        tint = PrimaryColor,
-                        modifier = Modifier
-                            .padding(end = 12.dp)
-                            .size(24.dp)
-                            .clickable(
-                                interactionSource = remember {
-                                    MutableInteractionSource()
-                                },
-                                indication = null
-                            ) {
-                                navHostController.navigateTo(
-                                    arg = NavArgument(
-                                        argument = SERVANT_INFO_ARG,
-                                        value = servant.id
-                                    ),
-                                    dest = ADD_SERVANT
-                                )
-                            }
-                    )
-
-                    Icon(
-                        imageVector = ImageVector
-                            .vectorResource(R.drawable.ic_delete),
-                        contentDescription = null,
-                        tint = RedColor,
-                        modifier = Modifier
-                            .padding(end = 12.dp)
-                            .size(24.dp)
-                            .clickable(
-                                interactionSource = remember {
-                                    MutableInteractionSource()
-                                },
-                                indication = null
-                            ) {
-                                mainVm.deleteServant(servant)
-                                navHostController.navigateUp()
-                            }
-                    )
-                }
-            }
             ServantAvatar(
                 modifier = Modifier.align(Center),
                 servant = servant,
@@ -259,22 +208,44 @@ private fun Content(
 }
 
 @Composable
+private fun TopBar(navHostController: NavHostController) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Background),
+        contentAlignment = Center
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_back_arrow),
+            contentDescription = null,
+            tint = PrimaryColor,
+            modifier = Modifier
+                .align(CenterStart)
+                .padding(12.dp)
+                .size(24.dp)
+                .clickable(
+                    interactionSource = remember {
+                        MutableInteractionSource()
+                    },
+                    indication = null
+                ) { navHostController.navigateUp() }
+        )
+    }
+}
+
+@Composable
 fun ServantAvatar(
     servant: Servant,
     size: Dp,
     modifier: Modifier = Modifier
 ) {
-    when {
-        servant.avatarPath.isNotBlank() -> Uri.parse(servant.avatarPath)
-        servant.avatarUrl.isNotBlank() -> servant.avatarUrl
-        else -> null
-    }?.let { image ->
+    servant.avatarUrl.ifBlank { null }?.let { image ->
         AsyncImage(
             contentDescription = null,
             modifier = modifier
                 .size(size)
                 .clip(CircleShape),
-            contentScale = ContentScale.Crop,
+            contentScale = Crop,
             model = image
         )
     } ?: run {

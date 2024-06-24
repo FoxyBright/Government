@@ -1,65 +1,81 @@
 package com.study.government.tools
 
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
+import android.content.Intent.ACTION_VIEW
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.Intent.FLAG_ACTIVITY_NO_HISTORY
 import android.net.Uri
+import android.net.Uri.fromParts
+import android.net.Uri.parse
+import android.widget.Toast
+import android.widget.Toast.LENGTH_SHORT
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
-import androidx.core.content.ContextCompat.startActivity
+import com.study.government.GovernmentApp.Companion.instance
+import com.study.government.R
 
-object WebWorker {
+object UriWorker {
 
-    private const val RECOVERY_PASSWORD_URL = "https://esia.gosuslugi.ru/login/recovery"
-    private const val REGISTRATION_URL = "https://esia.gosuslugi.ru/login/registration"
-    private const val GOSUSLUGI_URL = "https://gosuslugi.ru"
+    fun openMail(
+        email: String = "",
+        text: String = "",
+        subject: String = instance.getString(R.string.appeal)
+    ) {
+        instance.openApp(
+            uri = parse("mailto:?subject=$subject&to=$email&body=$text"),
+            applicationName = instance.getString(R.string.mail)
+        )
+    }
 
-    fun openRecoveryPassword(context: Context) {
+    fun openPhone(phone: String) {
+        val intent = Intent(Intent.ACTION_DIAL)
+        intent.flags = FLAG_ACTIVITY_NEW_TASK
+        intent.data = fromParts("tel", phone, null)
+        instance.startActivity(intent)
+    }
+
+    fun openMap(address: String) {
+        instance.openApp(
+            uri = parse("geo:0,0?q=$address"),
+            applicationName = instance.getString(R.string.maps)
+        )
+    }
+
+    private fun Context.openApp(uri: Uri, applicationName: String) {
+        val intent = Intent(ACTION_VIEW)
+        intent.addFlags(FLAG_ACTIVITY_NEW_TASK)
+        intent.setData(uri)
+
         try {
-            openInWeb(context, RECOVERY_PASSWORD_URL)
-        } catch (e: Exception) {
-            e.message.logE("error ope in web")
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            makeToast(getString(R.string.missing_application, applicationName))
         }
     }
 
-    fun openRegistration(context: Context) {
-        try {
-            openInWeb(context, REGISTRATION_URL)
-        } catch (e: Exception) {
-            e.message.logE("error ope in web")
-        }
-    }
-
-    fun openGosuslugi(context: Context) {
-        try {
-            openInWeb(context, GOSUSLUGI_URL)
-        } catch (e: Exception) {
-            e.message.logE("error ope in web")
-        }
-    }
-
-    fun openInWeb(context: Context, uri: String) {
-        try {
-            openInWeb(context, Uri.parse(uri))
-        } catch (e: Exception) {
-            e.message.logE("error ope in web")
-        }
-    }
-
-    private fun openInWeb(context: Context, uri: Uri) {
+    fun openLink(uri: String) {
         try {
             CustomTabsIntent.Builder().apply {
-                setDefaultColorSchemeParams(tabColorScheme)
+                setDefaultColorSchemeParams(
+                    CustomTabColorSchemeParams
+                        .Builder()
+                        .build()
+                )
                 setUrlBarHidingEnabled(true)
             }.build().run {
                 intent.addFlags(FLAG_ACTIVITY_NO_HISTORY)
-                intent.data = uri
-                startActivity(context, intent, startAnimationBundle)
+                intent.addFlags(FLAG_ACTIVITY_NEW_TASK)
+                intent.data = parse(uri)
+                instance.startActivity(intent, startAnimationBundle)
             }
         } catch (e: Exception) {
-            e.message.logE("error ope in web")
+            e.printStackTrace()
         }
     }
 
-    private val tabColorScheme
-        get() = CustomTabColorSchemeParams.Builder().build()
+    private fun Context.makeToast(text: String, duration: Int = LENGTH_SHORT) {
+        Toast.makeText(this, text, duration).show()
+    }
 }

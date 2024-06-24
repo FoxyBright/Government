@@ -4,11 +4,6 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    <uses-permission
-        android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" />
-
     <application
         android:name=".GovernmentApp"
         android:allowBackup="true"
@@ -25,7 +20,7 @@
             android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Government"
-            tools:ignore="LockedOrientationActivity">
+            tools:ignore="DiscouragedApi,LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
